@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.prefs.InvalidPreferencesFormatException;
 
 public final class PluginManager implements IPluginManager {
 //	private static final PluginManager instance = new PluginManager();
@@ -152,9 +153,11 @@ public final class PluginManager implements IPluginManager {
 	 * @param meta
 	 */
 	private void addPlugin(final PluginMeta meta){
+		//check if metadata is valid
 		if(meta == null || !meta.isValid())
 			return;
 
+		//load plugin (uses classloader to load plugin class defined in metadata)
 		try {
 			meta.loadPlugin();
 		} catch (ClassNotFoundException e) {
@@ -162,6 +165,7 @@ public final class PluginManager implements IPluginManager {
 			return;
 		}
 
+		//ignore classes with same package as our plugin classes
 		if(meta.getPluginClass().getPackage().getName().
 				equalsIgnoreCase(this.getClass().getPackage().getName()))
 			return;
@@ -210,8 +214,9 @@ public final class PluginManager implements IPluginManager {
 			pe.getPlugin().onUnregister();
 		} catch (InterruptedException e) {
 			handler.pluginExceptionCaught(e, pe);
+			handler.managerExceptionCaught(e, pe);
 		} catch (Throwable t) {
-
+			handler.pluginExceptionCaught(t, pe);
 		}
 		this.removePlugin(pe);
 		handler.onPluginRemoved(pe);
@@ -227,6 +232,7 @@ public final class PluginManager implements IPluginManager {
 		}
 	}
 
+	@Deprecated
 	private boolean validatePM(IPluginMeta pm){
 		return pm != null && pm.isValid() && pm instanceof PluginMeta;
 	}

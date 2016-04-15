@@ -8,6 +8,10 @@ package com.roop.utils.plugin;
  * Time: 19:52
  * Copyright: Ralf Wiedemann
  */
+
+/**
+ * Those Methods need to be implemented by the Main-Application Developer.
+ */
 public interface IPluginManagerHandler {
 	public void managerExceptionCaught(Throwable e);
 	public void pluginExceptionCaught(Throwable e, PluginEntry pe);

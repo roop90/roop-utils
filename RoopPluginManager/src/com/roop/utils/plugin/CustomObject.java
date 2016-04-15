@@ -8,6 +8,11 @@ package com.roop.utils.plugin;
  * Time: 21:38
  * Copyright: Ralf Wiedemann
  */
+
+/**
+ * CustomObjects make it possible to present any Object and its class to a plugin.
+ * The Plugin Developer decides whether to use it or not.
+ */
 public class CustomObject implements ICustomObject {
 	private final String classname;
 	private final Object object;

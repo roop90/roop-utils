@@ -4,6 +4,16 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+/**
+ * Every Plugin-Jar needs to contain a textfile named "plugin" in its root directory.
+ * It must contain a version, main-class and a name. It should look like this:
+ *
+ * version=1
+ * main=com.test.plugin.HelloWorld
+ * name=Hello World Plugin
+ *
+ * This class represent these metadata and can be used in code.
+ */
 final class PluginMeta implements IPluginMeta {
 	private static final String VERSION_STRING = "version=";
 	private static final String CLASS_STRING = "main=";

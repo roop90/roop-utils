@@ -40,13 +40,25 @@ public class PartExtractor implements Closeable{
 		this.pSize = pSize;
 		this.calcPartCount(ram.length(), pSize);
 	}
+
+	/**
+	 * Calculates the partsize as a multiple of minPsize depending on maxPcount.
+	 * The calculated partsize will lead to a partcount lower than maxPcount.
+	 * This will be useful in a situation where the amount of parts should be limited.
+	 * Be careful
+	 * @param file
+	 * @param write if true file will be opened rw, else ro
+	 * @param minPsize minimum partsize in bytes
+	 * @param maxPcount maximum partcount
+	 * @throws IOException
+	 */
 	public PartExtractor(String file, boolean write, int minPsize, int maxPcount) throws IOException {
 		if(minPsize <= 0 || maxPcount <= 0){
 			throw new IllegalArgumentException();
 		}
 
 		this.ram = new RandomAccessFile(file, write ? "rw" : "r");
-		this.pSize = (int)(ram.length()/(maxPcount*minPsize)+1)*minPsize;
+		this.pSize = (int)(ram.length() / (maxPcount * minPsize) + 1) * minPsize;
 		this.calcPartCount(ram.length(), pSize);
 	}
 

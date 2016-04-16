@@ -10,7 +10,7 @@ Usage:
 
 2. Hash Utils
 Info: Provides a Enum for simple and fast hashing of a byte array to CRC32, SHA-1, SHA-256 and SHA-512
-Warning: -
+Warning: no
 Usage:
 		byte[] data = HashUtil.SHA256.hash(ByteUtil.UTF8.getBytes("Hallo Welt"));
 		byte[] data = HashUtil.SHA256.hash(new File("/test.file");

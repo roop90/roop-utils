@@ -1,7 +1,7 @@
 # roop-utils
 A collection of usefull Java util classes.
 
-1. Binery Utils
+1. Binery Utils <br/>
 Info: Provides a Enum for simple and fast convertion between byte arrays and hex, base64 or utf8 String.
 Warning: Does not work under Android.
 Usage:

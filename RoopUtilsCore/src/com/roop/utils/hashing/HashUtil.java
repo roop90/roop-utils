@@ -3,6 +3,7 @@ package com.roop.utils.hashing;
 import com.roop.utils.Constants;
 import com.roop.utils.binary.ByteUtil;
 import com.roop.utils.binary.IByteUtil;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -88,25 +89,23 @@ public enum HashUtil {
 												//needs syncronization to work... shame on that
 
 		private byte[] toByte(long val){		//todo make it better?
-			String hex = Long.toHexString(c.getValue());
-			hex = hex.length() %2 == 0 ? hex : "0"+hex;
+			String hex = Long.toHexString(val);
+			hex = hex.length() % 2 == 0 ? hex : "0"+hex;		//add a zero if string could not convert to full bytes
 
 			return ByteUtil.Hex.getBytes(hex);
 		}
 
 		@Override
-		public byte[] hash(byte[] in) {
+		public Long hashRaw(byte[] in) {
 			synchronized (c) {
 				c.reset();
 				c.update(in);
 
-				return toByte(c.getValue());
+				return c.getValue();
 			}
 		}
 
-		@Override
-		public byte[] hash(InputStream in) throws IOException {
-//			return hash(Utils.read(in));
+		public long hashRaw(InputStream in) throws IOException {
 			synchronized (c) {
 				c.reset();
 
@@ -116,12 +115,11 @@ public enum HashUtil {
 					c.update(buf, 0, size);
 				}
 
-				return toByte(c.getValue());
+				return c.getValue();
 			}
 		}
 
-		@Override
-		public byte[] hash(ByteBuffer in) {
+		public long hashRaw(ByteBuffer in) {
 			synchronized (c) {
 				c.reset();
 
@@ -129,12 +127,11 @@ public enum HashUtil {
 					c.update(in.get());
 				}
 
-				return toByte(c.getValue());
+				return c.getValue();
 			}
 		}
 
-		@Override
-		public byte[] hash(ByteChannel in) throws IOException {
+		public long hashRaw(ByteChannel in) throws IOException {
 			synchronized (c) {
 				c.reset();
 
@@ -146,17 +143,59 @@ public enum HashUtil {
 					buff.clear();
 				}
 
-				return toByte(c.getValue());
+				return c.getValue();
 			}
+		}
+
+		@Override
+		public byte[] hash(byte[] in) {
+			return toByte((Long) hashRaw(in));
+
+//			synchronized (c) {
+//				c.reset();
+//				c.update(in);
+//
+//				return toByte(c.getValue());
+//			}
+		}
+
+		@Override
+		public byte[] hash(InputStream in) throws IOException {
+//			return hash(Utils.read(in));
+
+			return toByte(this.hashRaw(in));
+		}
+
+		@Override
+		public byte[] hash(ByteBuffer in) {
+			return toByte(hashRaw(in));
+		}
+
+		@Override
+		public byte[] hash(ByteChannel in) throws IOException {
+			return toByte(hashRaw(in));
 		}
 	};
 
 	//abstracts
+//	public abstract <E> E hashRaw(byte[] in, Class<? extends E> clazz);
+
 	public abstract byte[] hash(byte[] in);
 	public abstract byte[] hash(InputStream in) throws IOException;
 	public abstract byte[] hash(ByteBuffer in);
 	public abstract byte[] hash(ByteChannel in) throws IOException;
 	//abstracts end
+
+	/**
+	 * Returns a raw value if the hashing algorithm provides such.
+	 * In case of crc32 this returns a long value.
+	 * @param in
+	 * @param <E>
+	 * @return
+	 */
+	public <E> E hashRaw(byte[] in) {
+		throw new NotImplementedException();
+	}
 
 	protected byte[] hash(byte[] data, String instance){
 		try {

@@ -17,6 +17,17 @@ import java.nio.channels.WritableByteChannel;
  * Created by roop on 12.08.2015.
  */
 public class Utils {
+	public interface ICopyCallback {
+		/**
+		 *
+		 * @param copiedBytes last copied data in bytes
+		 * @return true to interrupt copy
+		 */
+		public boolean onProgress(int copiedBytes);
+		public void onException(IOException e);
+		public void onFinish();
+	}
+
 	protected static final String NO_DATA = "No Data";
 	protected static final int DEFAULT_BS = 1024*1024*5;
 	protected static final IByteUtil DEFAULT_CODER = ByteUtil.Base64;
@@ -25,7 +36,7 @@ public class Utils {
 	}
 
 	//simple copy with input-/outputstream
-	public static void copy(InputStream in, OutputStream out, long size) throws IOException {
+	public static void copy(InputStream in, OutputStream out, long limit) throws IOException {
 
 		long count = 0;
 		final ReadableByteChannel src = Channels.newChannel(in);
@@ -43,17 +54,7 @@ public class Utils {
 			dest.write(buffer);
 
 			buffer.compact();
-		}while(read != -1 && count < size);
-
-//		while (src.read(buffer) != -1 && count < size) {
-//
-//			buffer.flip();
-//			count+=buffer.remaining();
-//
-//			dest.write(buffer);
-//
-//			buffer.compact();
-//		}
+		}while(read != -1 && count < limit);
 
 		buffer.flip();
 
@@ -80,6 +81,46 @@ public class Utils {
 
 		while (buffer.hasRemaining()) {
 			dest.write(buffer);
+		}
+	}
+
+	public static void copy(InputStream in, OutputStream out, ICopyCallback cb) {
+		final ReadableByteChannel src = Channels.newChannel(in);
+		final WritableByteChannel dest = Channels.newChannel(out);
+
+		final ByteBuffer buffer = ByteBuffer.allocateDirect(DEFAULT_BS);
+
+		try {
+
+			long t0 = System.currentTimeMillis();
+			while (src.read(buffer) != -1) {
+
+				buffer.flip();
+
+				dest.write(buffer);
+
+				int data = buffer.position();
+
+				buffer.compact();
+
+				if(System.currentTimeMillis() - t0 > 100) {
+					t0 = System.currentTimeMillis();
+					if (cb.onProgress(data))
+						return;
+				}
+			}
+
+			buffer.flip();
+
+			while (buffer.hasRemaining()) {
+				dest.write(buffer);
+			}
+
+			cb.onProgress(buffer.position());
+
+			cb.onFinish();
+		} catch (IOException e) {
+			cb.onException(e);
 		}
 	}
 

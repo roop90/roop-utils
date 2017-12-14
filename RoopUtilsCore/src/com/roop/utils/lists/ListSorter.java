@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class ListSorter<T> {
 
-	private final Comparator<? super T> _comperator;
+	protected final Comparator<? super T> _comperator;
 
 	public ListSorter(Comparator<? super T> comparator){
 		_comperator = comparator;

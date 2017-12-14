@@ -7,6 +7,7 @@ package com.roop.utils.io.file;
  * Time: 02:44
  * Copyright: roop
  */
+//todo maybe switch to ByteBuffer and simply refill it
 public class FilePart {
 	private int pNumber;
 	private byte[] data = null;

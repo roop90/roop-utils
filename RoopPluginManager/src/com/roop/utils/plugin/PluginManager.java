@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import java.util.prefs.InvalidPreferencesFormatException;
 
 public final class PluginManager implements IPluginManager {
 //	private static final PluginManager instance = new PluginManager();
@@ -214,7 +213,7 @@ public final class PluginManager implements IPluginManager {
 			pe.getPlugin().onUnregister();
 		} catch (InterruptedException e) {
 			handler.pluginExceptionCaught(e, pe);
-			handler.managerExceptionCaught(e, pe);
+			handler.managerExceptionCaught(e);
 		} catch (Throwable t) {
 			handler.pluginExceptionCaught(t, pe);
 		}
